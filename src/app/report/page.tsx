@@ -20,7 +20,6 @@ import { Loader2, MapPin, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { Logo } from '@/components/ui/logo';
 import { Navigation } from '@/components/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
 
 const reportSchema = z.object({
   driverName: z.string().min(1, 'Driver name is required'),
