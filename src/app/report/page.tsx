@@ -25,7 +25,6 @@ const reportSchema = z.object({
   driverPhone: z.string().optional(),
   fleetNumber: z.string().min(1, 'Fleet number is required'),
   primeRego: z.string().optional(),
-  trailerSet: z.string().optional(),
   trailerA: z.string().optional(),
   trailerB: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
@@ -88,7 +87,6 @@ export default function ReportPage() {
 
   const driverName = watch('driverName');
   const fleetNumber = watch('fleetNumber');
-  const trailerSet = watch('trailerSet');
 
   // Enhanced auto-fill logic using comprehensive fleet data
   useEffect(() => {
@@ -249,15 +247,6 @@ export default function ReportPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="trailerSet">Trailer Set</Label>
-                  <Input id="trailerSet" {...register('trailerSet')} placeholder="e.g., 58A/58B" list="trailerSets" />
-                  <datalist id="trailerSets">
-                    {trailerSets.map((set) => (
-                      <option key={set} value={set} />
-                    ))}
-                  </datalist>
-                </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
