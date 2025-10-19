@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  DRIVER
+  WORKSHOP
+  OPERATIONS
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  SCHEDULED
+  COMPLETED
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String?  @unique
+  username  String?  @unique
+  password  String?  // hashed
+  role      Role     @default(DRIVER)
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  workOrders WorkOrder[]
+  comments   Comment[]
+}
+
+model Issue {
+  id             String    @id @default(cuid())
+  ticket         Int       @unique
+  status         Status    @default(PENDING)
+  severity       Severity  @default(LOW)
+  category       String
+  description    String
+  safeToContinue String?
+  location       String?
+  preferredFrom  DateTime?
+  preferredTo    DateTime?
+  fleetNumber    String
+  primeRego      String?
+  trailerA       String?
+  trailerB       String?
+  driverName     String
+  driverPhone    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  
+  comments   Comment[]
+  media      Media[]
+  workOrders WorkOrder[]
+}
+
+model WorkOrder {
+  id           String   @id @default(cuid())
+  issueId      String
+  issue        Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  status       Status   @default(SCHEDULED)
+  startAt      DateTime
+  endAt        DateTime
+  workshopSite String?
+  assignedToId String?
+  assignedTo   User?    @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  workType     String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  issueId   String
+  issue     Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  issueId   String
+  issue     Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  url       String
+  type      String   // image/jpeg, video/mp4
+  createdAt DateTime @default(now())
+}
+
+model Mapping {
+  id        String   @id @default(cuid())
+  kind      String   // "driver","fleet","trailerSet"
+  key       String   // e.g. "XW16GH" or "58A/58B" or driver name
+  value     String   // JSON payload (e.g. regos/phone)
+  updatedAt DateTime @updatedAt
+  
+  @@unique([kind, key])
+}

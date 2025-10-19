@@ -1,0 +1,158 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { IssueCard } from '@/components/issue-card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Logo } from '@/components/ui/logo';
+import { Navigation } from '@/components/navigation';
+import { LogOut, Filter } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
+import { Issue } from '@prisma/client';
+
+export default function WorkshopPage() {
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
+  const [severityFilter, setSeverityFilter] = useState<string>('all');
+  const [fleetFilter, setFleetFilter] = useState<string>('');
+
+  useEffect(() => {
+    fetchIssues();
+  }, []);
+
+  useEffect(() => {
+    filterIssues();
+  }, [issues, severityFilter, fleetFilter]);
+
+  const fetchIssues = async () => {
+    try {
+      const response = await fetch('/api/issues');
+      if (response.ok) {
+        const data = await response.json();
+        setIssues(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch issues:', error);
+    }
+  };
+
+  const filterIssues = () => {
+    let filtered = [...issues];
+    
+    if (severityFilter !== 'all') {
+      filtered = filtered.filter((issue) => issue.severity === severityFilter);
+    }
+    
+    if (fleetFilter) {
+      filtered = filtered.filter((issue) => 
+        issue.fleetNumber.toLowerCase().includes(fleetFilter.toLowerCase())
+      );
+    }
+    
+    setFilteredIssues(filtered);
+  };
+
+  const getIssuesByStatus = (status: string) => {
+    return filteredIssues.filter((issue) => issue.status === status);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <Navigation />
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-6">
+            <Logo size="lg" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Workshop Dashboard</h1>
+              <p className="text-gray-600 dark:text-gray-300">Manage and track repair issues</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Severity</SelectItem>
+                  <SelectItem value="CRITICAL">Critical</SelectItem>
+                  <SelectItem value="HIGH">High</SelectItem>
+                  <SelectItem value="MEDIUM">Medium</SelectItem>
+                  <SelectItem value="LOW">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Input
+              placeholder="Filter by fleet..."
+              value={fleetFilter}
+              onChange={(e) => setFleetFilter(e.target.value)}
+              className="max-w-xs"
+            />
+          </div>
+        </div>
+
+        <Tabs defaultValue="kanban">
+          <TabsList>
+            <TabsTrigger value="kanban">Kanban</TabsTrigger>
+            <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="kanban">
+            <div className="grid md:grid-cols-4 gap-6">
+              {['PENDING', 'IN_PROGRESS', 'SCHEDULED', 'COMPLETED'].map((status) => (
+                <Card key={status} className="rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium">
+                      {status.replace('_', ' ')}
+                      <span className="ml-2 text-muted-foreground">
+                        ({getIssuesByStatus(status).length})
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 max-h-[calc(100vh-24rem)] overflow-y-auto">
+                    {getIssuesByStatus(status).map((issue) => (
+                      <IssueCard
+                        key={issue.id}
+                        issue={issue}
+                        onSchedule={() => {}}
+                        onComment={() => {}}
+                      />
+                    ))}
+                    {getIssuesByStatus(status).length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center py-8">
+                        No issues
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="schedule">
+            <Card className="rounded-2xl">
+              <CardContent className="pt-6">
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground mb-4">View the full schedule</p>
+                  <Link href="/schedule">
+                    <Button>Open Schedule</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}
+

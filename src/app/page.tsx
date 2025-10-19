@@ -1,103 +1,95 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Logo } from '@/components/ui/logo';
+import { Navigation } from '@/components/navigation';
+import { Truck, ArrowRight, Shield, Clock, CheckCircle, Users } from 'lucide-react';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <Navigation />
+      
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-6xl mx-auto">
+                 {/* Hero Section */}
+                 <div className="text-center space-y-8 mb-20">
+                   <div className="flex justify-center mb-8">
+                     <Logo size="xl" />
+                   </div>
+                   <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 dark:text-white">
+                     SE Repairs
+                   </h1>
+                   <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                     Professional truck and trailer repair management system
+                   </p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+                   <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
+                     <Link href="/report">
+                       <Button size="lg" className="text-lg px-10 py-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 font-semibold">
+                         <Truck className="mr-2 h-5 w-5" />
+                         Report an Issue
+                         <ArrowRight className="ml-2 h-4 w-4" />
+                       </Button>
+                     </Link>
+                     <Link href="/login">
+                       <Button variant="outline" size="lg" className="text-lg px-10 py-6 rounded-xl border-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 font-semibold">
+                         <Users className="mr-2 h-5 w-5" />
+                         Staff Login
+                       </Button>
+                     </Link>
+                   </div>
+                 </div>
+
+                 {/* Professional Features */}
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+                   <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                     <CardContent className="p-8 text-center">
+                       <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                         <Clock className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                       </div>
+                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Fast Response</h3>
+                       <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                         Issues are reported and tracked in real-time with instant notifications to workshop staff.
+                       </p>
+                     </CardContent>
+                   </Card>
+
+                   <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                     <CardContent className="p-8 text-center">
+                       <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                         <Shield className="w-8 h-8 text-green-600 dark:text-green-400" />
+                       </div>
+                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Secure & Reliable</h3>
+                       <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                         Enterprise-grade security with offline capabilities and automatic data synchronization.
+                       </p>
+                     </CardContent>
+                   </Card>
+
+                   <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                     <CardContent className="p-8 text-center">
+                       <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                         <CheckCircle className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                       </div>
+                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Quality Assurance</h3>
+                       <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                         Comprehensive tracking and quality control with detailed reporting and analytics.
+                       </p>
+                     </CardContent>
+                   </Card>
+                 </div>
+
+
+                 {/* Footer with Credit */}
+                 <div className="text-center pt-8 border-t border-gray-200 dark:border-gray-700">
+                   <p className="text-sm text-gray-500 dark:text-gray-400">
+                     Created by <span className="font-medium text-gray-700 dark:text-gray-300">Karan</span>
+                   </p>
+                 </div>
+
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
