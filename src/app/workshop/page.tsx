@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Issue } from '@prisma/client';
+import { TruckBooking } from '@/components/truck-booking';
 
 export default function WorkshopPage() {
   const { isAuthenticated, accessLevel, loading, logout } = useAuth();
@@ -134,6 +135,7 @@ export default function WorkshopPage() {
           <TabsList>
             <TabsTrigger value="kanban">Kanban</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
+            <TabsTrigger value="booking">Book Service</TabsTrigger>
           </TabsList>
 
           <TabsContent value="kanban">
@@ -194,6 +196,12 @@ export default function WorkshopPage() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="booking">
+            <div className="grid gap-6">
+              <TruckBooking />
             </div>
           </TabsContent>
         </Tabs>

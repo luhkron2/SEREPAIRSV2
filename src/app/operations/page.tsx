@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Issue } from '@prisma/client';
+import { TruckBooking } from '@/components/truck-booking';
 
 export default function OperationsPage() {
   const { isAuthenticated, accessLevel, loading, logout } = useAuth();
@@ -74,20 +75,6 @@ export default function OperationsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || accessLevel !== 'operations') {
-    return null; // Will redirect via useAuth
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -136,6 +123,12 @@ export default function OperationsPage() {
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Truck Booking Section */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Book Truck Service</h2>
+          <TruckBooking />
         </div>
 
         {/* Schedule Section */}

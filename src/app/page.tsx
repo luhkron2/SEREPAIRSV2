@@ -7,8 +7,7 @@ import { Truck, ArrowRight, Shield, Clock, CheckCircle, Users } from 'lucide-rea
 import { redirect } from 'next/navigation';
 
 export default function HomePage() {
-  // Redirect to access page
-  redirect('/access');
+  // Public homepage - accessible to anyone
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Navigation />
@@ -35,10 +34,10 @@ export default function HomePage() {
                          <ArrowRight className="ml-2 h-4 w-4" />
                        </Button>
                      </Link>
-                     <Link href="/login">
+                     <Link href="/access">
                        <Button variant="outline" size="lg" className="text-lg px-10 py-6 rounded-xl border-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 font-semibold">
                          <Users className="mr-2 h-5 w-5" />
-                         Staff Login
+                         Staff Access
                        </Button>
                      </Link>
                    </div>

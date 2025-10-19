@@ -19,7 +19,6 @@ import { toast } from 'sonner';
 import { Loader2, MapPin, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { Logo } from '@/components/ui/logo';
 import { Navigation } from '@/components/navigation';
-import { useAuth } from '@/hooks/useAuth';
 
 const reportSchema = z.object({
   driverName: z.string().min(1, 'Driver name is required'),
@@ -40,7 +39,6 @@ const reportSchema = z.object({
 type ReportForm = z.infer<typeof reportSchema>;
 
 export default function ReportPage() {
-  const { isAuthenticated, accessLevel, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [mappings, setMappings] = useState<MappingsCache | null>(null);
@@ -92,14 +90,6 @@ export default function ReportPage() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!authLoading) {
-      if (!isAuthenticated) {
-        router.push('/access');
-        return;
-      }
-    }
-  }, [authLoading, isAuthenticated, router]);
 
   const driverName = watch('driverName');
   const fleetNumber = watch('fleetNumber');
