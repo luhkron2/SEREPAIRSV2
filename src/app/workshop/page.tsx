@@ -139,16 +139,32 @@ export default function WorkshopPage() {
           </TabsContent>
 
           <TabsContent value="schedule">
-            <Card className="rounded-2xl">
-              <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground mb-4">View the full schedule</p>
-                  <Link href="/schedule">
-                    <Button>Open Schedule</Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="grid gap-6">
+              <Card className="rounded-2xl">
+                <CardHeader>
+                  <CardTitle>Today's Schedule</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {getIssuesByStatus('SCHEDULED').map((issue) => (
+                      <div key={issue.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                          <h4 className="font-medium">{issue.fleetNumber}</h4>
+                          <p className="text-sm text-muted-foreground">{issue.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium">{issue.severity}</p>
+                          <p className="text-xs text-muted-foreground">Scheduled</p>
+                        </div>
+                      </div>
+                    ))}
+                    {getIssuesByStatus('SCHEDULED').length === 0 && (
+                      <p className="text-center text-muted-foreground py-8">No scheduled repairs for today</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

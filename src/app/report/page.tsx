@@ -13,8 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { UploadZone } from '@/components/upload-zone';
+import { fetchMappings, type MappingsCache } from '@/lib/mappings';
 import { queueIssue, retryQueue, getQueueLength } from '@/lib/offline';
-import { getActiveFleetNumbers, getActiveDrivers } from '@/lib/fleet-data';
 import { toast } from 'sonner';
 import { Loader2, MapPin, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { Logo } from '@/components/ui/logo';
@@ -41,12 +41,15 @@ type ReportForm = z.infer<typeof reportSchema>;
 export default function ReportPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [mappings, setMappings] = useState<MappingsCache | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [isOffline, setIsOffline] = useState(false);
   
-  // Get comprehensive fleet data for dropdowns
-  const fleetNumbers = getActiveFleetNumbers();
-  const drivers = getActiveDrivers();
+  // Get dropdown data from database mappings
+  const fleetNumbers = mappings ? Object.keys(mappings.fleets).filter(fleet => mappings.fleets[fleet].status === 'Active').sort() : [];
+  const trailerAOptions = mappings ? Object.keys(mappings.trailers || {}).filter(trailer => mappings.trailers[trailer].type === 'Trailer A' && mappings.trailers[trailer].status === 'Active').sort() : [];
+  const trailerBOptions = mappings ? Object.keys(mappings.trailers || {}).filter(trailer => mappings.trailers[trailer].type === 'Trailer B' && mappings.trailers[trailer].status === 'Active').sort() : [];
+  const drivers = mappings ? Object.keys(mappings.drivers).filter(driver => mappings.drivers[driver].status === 'Active').sort() : [];
 
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ReportForm>({
     resolver: zodResolver(reportSchema),
@@ -57,6 +60,8 @@ export default function ReportPage() {
   });
 
   useEffect(() => {
+    fetchMappings().then(setMappings).catch(console.error);
+    
     const handleOnline = async () => {
       setIsOffline(false);
       // Retry offline queue when coming back online
@@ -88,11 +93,29 @@ export default function ReportPage() {
   const driverName = watch('driverName');
   const fleetNumber = watch('fleetNumber');
 
-  // Enhanced auto-fill logic using comprehensive fleet data
+  // Smart auto-fill logic - only auto-fill when fields are empty
   useEffect(() => {
-    // Auto-fill logic will be handled by database mappings
-    // This is a placeholder for future auto-fill functionality
-  }, [fleetNumber, driverName, setValue]);
+    if (!mappings) return;
+    
+    // Auto-fill driver phone when driver name is selected (only if phone field is empty)
+    if (driverName && mappings.drivers[driverName]) {
+      const driverData = mappings.drivers[driverName];
+      const currentPhone = watch('driverPhone');
+      if (driverData.phone && (!currentPhone || currentPhone.trim() === '')) {
+        setValue('driverPhone', driverData.phone);
+      }
+    }
+    
+    // Auto-fill fleet registration when fleet number is selected (only if rego field is empty)
+    if (fleetNumber && mappings.fleets[fleetNumber]) {
+      const fleetData = mappings.fleets[fleetNumber];
+      const currentRego = watch('primeRego');
+      if (fleetData.rego && (!currentRego || currentRego.trim() === '')) {
+        setValue('primeRego', fleetData.rego);
+      }
+    }
+    
+  }, [fleetNumber, driverName, setValue, mappings, watch]);
 
   const useGPS = () => {
     if ('geolocation' in navigator) {
@@ -112,8 +135,37 @@ export default function ReportPage() {
   };
 
   const manualAutoFill = () => {
-    // Auto-fill functionality will be implemented with database mappings
-    toast.info('Auto-fill feature will be available soon.');
+    if (!mappings) {
+      toast.error('Data not loaded yet');
+      return;
+    }
+
+    let filledCount = 0;
+
+    // Auto-fill driver phone if driver name is selected
+    if (driverName && mappings.drivers[driverName]) {
+      const driverData = mappings.drivers[driverName];
+      if (driverData.phone) {
+        setValue('driverPhone', driverData.phone);
+        filledCount++;
+      }
+    }
+    
+    // Auto-fill fleet registration if fleet number is selected
+    if (fleetNumber && mappings.fleets[fleetNumber]) {
+      const fleetData = mappings.fleets[fleetNumber];
+      if (fleetData.rego) {
+        setValue('primeRego', fleetData.rego);
+        filledCount++;
+      }
+    }
+    
+
+    if (filledCount > 0) {
+      toast.success(`Auto-filled ${filledCount} field${filledCount > 1 ? 's' : ''}`);
+    } else {
+      toast.info('No data available to auto-fill. Please select a fleet number or driver first.');
+    }
   };
 
   const onSubmit = async (data: ReportForm) => {
@@ -212,8 +264,8 @@ export default function ReportPage() {
                     <Label htmlFor="driverName">Driver Name *</Label>
                     <Input id="driverName" {...register('driverName')} list="drivers" />
                     <datalist id="drivers">
-                      {drivers.map((driver) => (
-                        <option key={driver.name} value={driver.name} />
+                      {drivers.map((driver, index) => (
+                        <option key={`${driver}-${index}`} value={driver} />
                       ))}
                     </datalist>
                     {errors.driverName && <p className="text-sm text-destructive">{errors.driverName.message}</p>}
@@ -247,16 +299,25 @@ export default function ReportPage() {
                   </div>
                 </div>
 
-
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="trailerA">Trailer A</Label>
-                    <Input id="trailerA" {...register('trailerA')} placeholder="e.g., 58A" />
+                    <Input id="trailerA" {...register('trailerA')} placeholder="e.g., 03A REGO" list="trailerA" />
+                    <datalist id="trailerA">
+                      {trailerAOptions.map((trailer, index) => (
+                        <option key={`${trailer}-${index}`} value={`${trailer} ${mappings?.trailers[trailer]?.rego || ''}`} />
+                      ))}
+                    </datalist>
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="trailerB">Trailer B</Label>
-                    <Input id="trailerB" {...register('trailerB')} placeholder="e.g., 58B" />
+                    <Input id="trailerB" {...register('trailerB')} placeholder="e.g., 03B REGO" list="trailerB" />
+                    <datalist id="trailerB">
+                      {trailerBOptions.map((trailer, index) => (
+                        <option key={`${trailer}-${index}`} value={`${trailer} ${mappings?.trailers[trailer]?.rego || ''}`} />
+                      ))}
+                    </datalist>
                   </div>
                 </div>
 

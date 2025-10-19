@@ -23,7 +23,6 @@ const navigation = [
   { name: 'Features', href: '/features', icon: Star },
   { name: 'Report', href: '/report', icon: FileText },
   { name: 'Workshop', href: '/workshop', icon: Wrench },
-  { name: 'Schedule', href: '/schedule', icon: Calendar },
   { name: 'Operations', href: '/operations', icon: Settings },
 ];
 

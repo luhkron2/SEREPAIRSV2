@@ -75,7 +75,6 @@ export default function OperationsPage() {
               <nav className="hidden md:flex gap-4">
                 <Link href="/workshop" className="text-sm font-medium">Workshop</Link>
                 <Link href="/operations" className="text-sm font-medium">Operations</Link>
-                <Link href="/schedule" className="text-sm font-medium">Schedule</Link>
                 <Link href="/admin/mappings" className="text-sm font-medium">Admin</Link>
               </nav>
             </div>
@@ -111,6 +110,31 @@ export default function OperationsPage() {
                 <Download className="w-4 h-4 mr-2" />
                 Export PDF
               </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Schedule Section */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Today's Schedule</h2>
+          <div className="bg-card rounded-2xl border p-6">
+            <div className="space-y-4">
+              {issues.filter(issue => issue.status === 'SCHEDULED').map((issue) => (
+                <div key={issue.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">#{issue.ticket} - {issue.fleetNumber}</h4>
+                    <p className="text-sm text-muted-foreground">{issue.description}</p>
+                    <p className="text-xs text-muted-foreground">Driver: {issue.driverName}</p>
+                  </div>
+                  <div className="text-right">
+                    <SeverityBadge severity={issue.severity} />
+                    <p className="text-xs text-muted-foreground mt-1">Scheduled</p>
+                  </div>
+                </div>
+              ))}
+              {issues.filter(issue => issue.status === 'SCHEDULED').length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No scheduled repairs for today</p>
+              )}
             </div>
           </div>
         </div>
