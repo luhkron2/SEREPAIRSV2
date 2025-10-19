@@ -4,8 +4,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Logo } from '@/components/ui/logo';
 import { Navigation } from '@/components/navigation';
 import { Truck, ArrowRight, Shield, Clock, CheckCircle, Users } from 'lucide-react';
+import { redirect } from 'next/navigation';
 
 export default function HomePage() {
+  // Redirect to access page
+  redirect('/access');
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Navigation />

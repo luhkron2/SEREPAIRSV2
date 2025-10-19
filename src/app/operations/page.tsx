@@ -8,18 +8,27 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
 import { formatMelbourneShort } from '@/lib/time';
 import { Download, Search, LogOut } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { Issue } from '@prisma/client';
 
 export default function OperationsPage() {
+  const { isAuthenticated, accessLevel, loading, logout, requireAuth } = useAuth();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
 
   useEffect(() => {
-    fetchIssues();
-  }, []);
+    if (!loading && !requireAuth('operations')) {
+      return;
+    }
+  }, [loading, requireAuth]);
+
+  useEffect(() => {
+    if (isAuthenticated && accessLevel === 'operations') {
+      fetchIssues();
+    }
+  }, [isAuthenticated, accessLevel]);
 
   useEffect(() => {
     const filtered = issues.filter((issue) => {
@@ -65,6 +74,21 @@ export default function OperationsPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || accessLevel !== 'operations') {
+    return null; // Will redirect via useAuth
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
@@ -78,7 +102,7 @@ export default function OperationsPage() {
                 <Link href="/admin/mappings" className="text-sm font-medium">Admin</Link>
               </nav>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => signOut({ callbackUrl: '/' })}>
+            <Button variant="ghost" size="sm" onClick={logout}>
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>

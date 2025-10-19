@@ -10,19 +10,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Logo } from '@/components/ui/logo';
 import { Navigation } from '@/components/navigation';
 import { LogOut, Filter } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { Issue } from '@prisma/client';
 
 export default function WorkshopPage() {
+  const { isAuthenticated, accessLevel, loading, logout, requireAuth } = useAuth();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [fleetFilter, setFleetFilter] = useState<string>('');
 
   useEffect(() => {
-    fetchIssues();
-  }, []);
+    if (!loading && !requireAuth('workshop')) {
+      return;
+    }
+  }, [loading, requireAuth]);
+
+  useEffect(() => {
+    if (isAuthenticated && accessLevel === 'workshop') {
+      fetchIssues();
+    }
+  }, [isAuthenticated, accessLevel]);
 
   useEffect(() => {
     filterIssues();
@@ -60,18 +69,39 @@ export default function WorkshopPage() {
     return filteredIssues.filter((issue) => issue.status === status);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || accessLevel !== 'workshop') {
+    return null; // Will redirect via useAuth
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Logo size="lg" />
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Workshop Dashboard</h1>
-              <p className="text-gray-600 dark:text-gray-300">Manage and track repair issues</p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <Logo size="lg" />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Workshop Dashboard</h1>
+                <p className="text-gray-600 dark:text-gray-300">Manage and track repair issues</p>
+              </div>
             </div>
+            <Button variant="ghost" size="sm" onClick={logout}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
           </div>
           
           <div className="flex flex-wrap gap-4">
