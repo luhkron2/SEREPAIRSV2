@@ -3,15 +3,10 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "installCommand": "npm install",
-  "functions": {
-    "src/app/api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "env": {
-    "NEXTAUTH_SECRET": "@nextauth_secret",
-    "NEXTAUTH_URL": "@nextauth_url",
-    "DATABASE_URL": "@database_url",
-    "BLOB_READ_WRITE_TOKEN": "@blob_read_write_token"
+    "NEXTAUTH_SECRET": "0k6ANWuGhTH8OEwCf2+Uq8A/t6m2Kp14Nuk/nXE+gX8=",
+    "NEXTAUTH_URL": "https://se-repairs.vercel.app",
+    "DATABASE_URL": "placeholder",
+    "BLOB_READ_WRITE_TOKEN": "placeholder"
   }
 }
