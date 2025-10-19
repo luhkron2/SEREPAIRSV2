@@ -11,6 +11,12 @@ export function useAuth() {
 
   useEffect(() => {
     const checkAuth = () => {
+      // Check if we're in the browser
+      if (typeof window === 'undefined') {
+        setLoading(false);
+        return;
+      }
+
       const auth = sessionStorage.getItem('isAuthenticated');
       const level = sessionStorage.getItem('accessLevel');
       

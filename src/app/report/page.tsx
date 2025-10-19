@@ -19,6 +19,8 @@ import { toast } from 'sonner';
 import { Loader2, MapPin, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { Logo } from '@/components/ui/logo';
 import { Navigation } from '@/components/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 const reportSchema = z.object({
   driverName: z.string().min(1, 'Driver name is required'),
@@ -29,7 +31,7 @@ const reportSchema = z.object({
   trailerB: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
   severity: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters'), 
   location: z.string().optional(),
   safeToContinue: z.string().optional(),
   preferredFrom: z.string().optional(),
@@ -39,6 +41,7 @@ const reportSchema = z.object({
 type ReportForm = z.infer<typeof reportSchema>;
 
 export default function ReportPage() {
+  const { isAuthenticated, accessLevel, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [mappings, setMappings] = useState<MappingsCache | null>(null);
@@ -89,6 +92,15 @@ export default function ReportPage() {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (!isAuthenticated) {
+        router.push('/access');
+        return;
+      }
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const driverName = watch('driverName');
   const fleetNumber = watch('fleetNumber');

@@ -9,26 +9,26 @@ import { SeverityBadge } from '@/components/ui/severity-badge';
 import { formatMelbourneShort } from '@/lib/time';
 import { Download, Search, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Issue } from '@prisma/client';
 
 export default function OperationsPage() {
-  const { isAuthenticated, accessLevel, loading, logout, requireAuth } = useAuth();
+  const { isAuthenticated, accessLevel, loading, logout } = useAuth();
+  const router = useRouter();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
 
   useEffect(() => {
-    if (!loading && !requireAuth('operations')) {
-      return;
-    }
-  }, [loading, requireAuth]);
-
-  useEffect(() => {
-    if (isAuthenticated && accessLevel === 'operations') {
+    if (!loading) {
+      if (!isAuthenticated || accessLevel !== 'operations') {
+        router.push('/access');
+        return;
+      }
       fetchIssues();
     }
-  }, [isAuthenticated, accessLevel]);
+  }, [loading, isAuthenticated, accessLevel, router]);
 
   useEffect(() => {
     const filtered = issues.filter((issue) => {

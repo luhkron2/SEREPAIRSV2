@@ -51,23 +51,24 @@ export default function AccessPage() {
 
     setLoading(true);
 
-    // Simulate password check
-    setTimeout(() => {
-      const accessConfig = ACCESS_LEVELS[selectedAccess as keyof typeof ACCESS_LEVELS];
-      
-      if (password === accessConfig.password) {
-        // Store access level in session storage
+    // Immediate password check
+    const accessConfig = ACCESS_LEVELS[selectedAccess as keyof typeof ACCESS_LEVELS];
+    
+    if (password === accessConfig.password) {
+      // Store access level in session storage
+      if (typeof window !== 'undefined') {
         sessionStorage.setItem('accessLevel', selectedAccess);
         sessionStorage.setItem('isAuthenticated', 'true');
-        
-        toast.success(`Welcome to ${accessConfig.name}!`);
-        router.push(accessConfig.redirect);
-      } else {
-        toast.error('Invalid password. Please try again.');
-        setPassword('');
       }
+      
+      toast.success(`Welcome to ${accessConfig.name}!`);
+      // Use window.location for immediate redirect
+      window.location.href = accessConfig.redirect;
+    } else {
+      toast.error('Invalid password. Please try again.');
+      setPassword('');
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleBack = () => {

@@ -11,27 +11,27 @@ import { Logo } from '@/components/ui/logo';
 import { Navigation } from '@/components/navigation';
 import { LogOut, Filter } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Issue } from '@prisma/client';
 
 export default function WorkshopPage() {
-  const { isAuthenticated, accessLevel, loading, logout, requireAuth } = useAuth();
+  const { isAuthenticated, accessLevel, loading, logout } = useAuth();
+  const router = useRouter();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([]);
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [fleetFilter, setFleetFilter] = useState<string>('');
 
   useEffect(() => {
-    if (!loading && !requireAuth('workshop')) {
-      return;
-    }
-  }, [loading, requireAuth]);
-
-  useEffect(() => {
-    if (isAuthenticated && accessLevel === 'workshop') {
+    if (!loading) {
+      if (!isAuthenticated || accessLevel !== 'workshop') {
+        router.push('/access');
+        return;
+      }
       fetchIssues();
     }
-  }, [isAuthenticated, accessLevel]);
+  }, [loading, isAuthenticated, accessLevel, router]);
 
   useEffect(() => {
     filterIssues();

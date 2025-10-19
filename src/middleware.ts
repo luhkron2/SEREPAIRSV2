@@ -9,22 +9,9 @@ export function middleware(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   
   if (isProtectedRoute) {
-    // Check for authentication in headers (we'll set this in the client)
-    const isAuthenticated = request.headers.get('x-authenticated') === 'true';
-    const accessLevel = request.headers.get('x-access-level');
-    
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL('/access', request.url));
-    }
-    
-    // Check specific access levels
-    if (pathname.startsWith('/workshop') && accessLevel !== 'workshop') {
-      return NextResponse.redirect(new URL('/access', request.url));
-    }
-    
-    if (pathname.startsWith('/operations') && accessLevel !== 'operations') {
-      return NextResponse.redirect(new URL('/access', request.url));
-    }
+    // For now, let the client-side authentication handle the protection
+    // The useAuth hook will redirect if not authenticated
+    return NextResponse.next();
   }
   
   return NextResponse.next();
